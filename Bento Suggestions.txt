@@ -1,0 +1,17 @@
+before centering, clean out noises (by averaging nearby pixels)
+centering, scaling algorith
+center of mass
+bounding box
+line of greatest verability
+get outer shape
+
+
+google
+k-d trees
+approximate nearest neighbor
+
+file type: .txt of 1/0 (img data set)
+file size: dimensions are the same
+
+
+make skeleton client that works for linux (4 arguments, output folder and stuff)
