@@ -1,6 +1,5 @@
-/* Author: Hanbi Kim
- * 
- * This program simply compares two images of 0/1 with same dimension
+/*  
+ * This program simply compares two images of 0/1 with the same dimensions
  * and returns the difference percentage. 
  * Adapted from Steven's source code.
  * 
@@ -19,9 +18,10 @@ public class SimpleComparison1 {
 		ArrayList<ArrayList<Integer>> imgArray1 = new ArrayList<ArrayList<Integer>>();	
 		ArrayList<ArrayList<Integer>> imgArray2 = new ArrayList<ArrayList<Integer>>();
 		
+		/* CAN SOMEONE PLEASE FIX THIS  READING IN FILE PART!!!! */
 		while (sc1.hasNext()){ // read until end of file
 			ArrayList<Integer> row = new ArrayList<Integer>();
-			boolean rowdone = false;
+			// boolean rowdone = false;
 			while(true){ // read one row at a time
 				String pix = sc1.next();
 				if (pix.equals("\n"))
