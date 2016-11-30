@@ -40,10 +40,30 @@ public class SimpleComparison1 {
 		
 		sc1.close(); 
 		sc2.close();
-
+		
+		TextImage img1 = new TextImage(args[0]);
+		TextImage img2 = new TextImage(args[1]);
+		int img1cols = img1.getCols();
+		int img1rows = img1.getRows();
+		int img2cols = img2.getCols();
+		int img2rows = img2.getRows();
+		
+		long diff2 = 0;
+		
+		for(int col=0; col<img1cols; col++) {
+			for(int row=0; row<img1rows; row++) {
+				int pix1 = img1.getPixel(row, col);
+				int pix2 = img2.getPixel(row, col);
+				diff2 += Math.abs(pix1-pix2);
+			}
+		}
+		
+		double z = img1cols*img2rows;
+		double per = diff2/z;
+		System.out.printf("%f\n", per*100);
 		
 		// 2. Compare two images
-		int height1 = imgArray1.size();
+		/*int height1 = imgArray1.size();
 		int width1 = imgArray1.get(0).size();
 		int height2 = imgArray2.size();
 		int width2 = imgArray2.get(0).size();
@@ -60,7 +80,7 @@ public class SimpleComparison1 {
 		
 		 double n = height1*width1;
 		 double p = diff/n;
-		 System.out.printf("Diff percent: %f\n",p*100);
+		 System.out.printf("Diff percent: %f\n",p*100);*/
 
 	}
 
