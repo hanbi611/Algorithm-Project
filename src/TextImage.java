@@ -10,7 +10,7 @@ public class TextImage {
 	private int[][] img;
 	private int rows, cols;
 	
-	public TextImage(BufferedImage buffImg) {
+	/*public TextImage(BufferedImage buffImg) {
 		//img = new ArrayList<>();
 		cols = buffImg.getWidth();
 		rows = buffImg.getHeight();
@@ -27,11 +27,17 @@ public class TextImage {
 			}
 			//img.add(temp);
 		}
-	}
+	}*/
 	
 	public TextImage(int[][] img, int rows, int cols) {
 		this.cols = cols;
 		this.rows = rows;
+		this.img = img;
+	}
+	
+	public TextImage(int[][] img) {
+		this.cols = img[0].length;
+		this.rows = img.length;
 		this.img = img;
 	}
 	
@@ -111,5 +117,54 @@ public class TextImage {
 		catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public void print(){
+		for(int row=0; row<rows; row++) {
+			for(int col=0; col<cols; col++) {
+				System.out.print(getPixel(row, col) + " ");
+			}
+			System.out.println("");
+		}
+	}
+	
+	public TextImage findBoundingBox(TextImage ti){
+		int[][] img = ti.getImg();
+		int rows = ti.getRows();
+		int cols = ti.getCols();
+		int top = -1; int bottom = -1; int left = cols-1; int right = 0;
+		for (int row = 0; row<rows; row++){
+			for (int col = 0; col<cols; col++){
+				if (img[row][col] == 1){
+					if (top < 0)
+						top = row;
+					if (col < left)
+						left = col;
+					if (col > right)
+						right = col;
+		}}}
+		
+		boolean found = false; 
+		for (int row = rows-1; row <=0; row --){
+			for (int col = 0; col < cols; col ++){
+				if (img[row][col] == 1)
+					found = true;
+			}
+			if (found == true){
+				bottom = row +1;
+				break;
+			}
+		}
+		int[][] newimg = new int[bottom-top+1][right-left+1];
+		int newRow = top - bottom +1; int newCol = right- left +1;
+		for (int row = 0; row<newRow; row++){
+			for (int col=0; col<newCol; col++){
+				newimg[row][col] = img[top][left];
+				left ++;
+			}
+			top ++;
+		}
+		
+		return new TextImage(newimg, newRow, newCol);
 	}
 }
