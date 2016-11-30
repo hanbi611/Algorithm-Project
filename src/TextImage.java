@@ -9,7 +9,7 @@ public class TextImage {
 	//private List<List<Integer>> img;
 	private int[][] img;
 	private int rows, cols;
-	
+
 	/*public TextImage(BufferedImage buffImg) {
 		//img = new ArrayList<>();
 		cols = buffImg.getWidth();
@@ -28,19 +28,19 @@ public class TextImage {
 			//img.add(temp);
 		}
 	}*/
-	
+
 	public TextImage(int[][] img) {
 		this.cols = img[0].length;
 		this.rows = img.length; //rows;
 		this.img = img;
 	}
-	
+
 	public TextImage(int rows, int cols) {
 		img = new int[rows][cols];
 		this.rows = rows;
 		this.cols = cols;
 	}
-	
+
 	public TextImage(String pathname) {
 		int[][] img;
 		int cols = 0;
@@ -69,40 +69,47 @@ public class TextImage {
 				lineScanner.close();
 			}
 			fileScanner.close();
+
+			int[][] cropped = findBoundingBox(img);
+			// do Aligning
+			// do centering & resizing
+
 			this.img = img;
 			this.rows = rows;
 			this.cols = cols;
+
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static int getColor(int x, int y, int color, BufferedImage img) {
 		int value = img.getRGB(x, y) >> color & 0xff;
-		return value;
+				return value;
 	}
-	
+
 	public boolean isBlack(int x, int y, BufferedImage img) {
 		return getColor(x, y, 16, img) == 0;
 	}
-	
+
 	public int getCols() {
 		return cols;
 	}
-	
+
 	public int getRows() {
 		return rows;
 	}
-	
+
 	public int getPixel(int row, int col) {
 		return img[row][col];
 	}
-	
+
 	public int[][] getImg() {
 		return img;
 	}
-	
+
 	public boolean setPixel(int p, int row, int col) {
 		try {
 			img[row][col] = p;
@@ -121,11 +128,13 @@ public class TextImage {
 			System.out.println("");
 		}
 	}
-	
-	public TextImage findBoundingBox(TextImage ti){
-		int[][] img = ti.getImg();
-		int rows = ti.getRows();
-		int cols = ti.getCols();
+
+	private int[][] findBoundingBox(int[][] img){
+		//int[][] img = ti.getImg();
+		//		int rows = ti.getRows();
+		//		int cols = ti.getCols();
+		int rows = img.length;
+		int cols = img[0].length;
 		int top = -1; int bottom = -1; int left = cols-1; int right = 0;
 		for (int row = 0; row<rows; row++){
 			for (int col = 0; col<cols; col++){
@@ -136,8 +145,8 @@ public class TextImage {
 						left = col;
 					if (col > right)
 						right = col;
-		}}}
-		
+				}}}
+
 		boolean found = false; 
 		for (int row = rows-1; row <=0; row --){
 			for (int col = 0; col < cols; col ++){
@@ -158,8 +167,20 @@ public class TextImage {
 			}
 			top ++;
 		}
-		
-		return new TextImage(newimg);
 
+		return newimg;
+
+	}
+
+	private TextImage process(TextImage txtImg) {
+		//This merely sets all pixels with a value of 2 or less to 0
+		//Should use after doing an averageProcess
+
+		TextImage img = new TextImage(txtImg.getImg()); //, txtImg.getRows(), txtImg.getCols());
+		for(int row=0; row<txtImg.getRows(); row++)
+			for(int col=0; col<txtImg.getCols(); col++)
+				if(txtImg.getPixel(row, col) < 3)
+					img.setPixel(0, row, col);
+		return img;
 	}
 }
