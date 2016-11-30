@@ -7,8 +7,11 @@ public class Main {
 		File inputFolder2 = new File(args[1]);
 		File outputFolder = new File(args[2]);
 		int k = Integer.parseInt(args[3]);
-		
-		
+
+
 	}
 
+
+
 }
+
