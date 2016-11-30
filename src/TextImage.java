@@ -29,9 +29,9 @@ public class TextImage {
 		}
 	}
 	
-	public TextImage(int[][] img, int rows, int cols) {
-		this.cols = cols;
-		this.rows = rows;
+	public TextImage(int[][] img) {
+		this.cols = img[0].length;
+		this.rows = img.length; //rows;
 		this.img = img;
 	}
 	
@@ -149,6 +149,6 @@ public class TextImage {
 			top ++;
 		}
 		
-		return new TextImage(newimg, newRow, newCol);
+		return new TextImage(newimg);
 	}
 }
