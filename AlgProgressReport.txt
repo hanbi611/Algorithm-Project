@@ -1,0 +1,26 @@
+Have:
+
+dataset
+noise filter
+bounding box
+resizing
+rough main client class
+-store resulting values in heap
+-remove max/min from heap k times for k closest neighbors
+
+idea on how to get primary axis and rotate the image
+-get image contour (when runs change)
+-resize using bounding box
+-divide image into k subquadrants
+-go through subsections on the perimeter
+-if a colored pixel found, go to radially opposite subsection and search for pixel
+-if pixel found, calculate distance and slope
+repeat above 3 times
+get primary axis
+rotate
+
+
+Don't have:
+How to pre-categorize images?
+rotate by contour and do a scan-line-fill?
+
