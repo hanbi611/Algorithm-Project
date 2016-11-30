@@ -10,7 +10,7 @@ public class TextImage {
 	private int[][] img;
 	private int rows, cols;
 	
-	public TextImage(BufferedImage buffImg) {
+	/*public TextImage(BufferedImage buffImg) {
 		//img = new ArrayList<>();
 		cols = buffImg.getWidth();
 		rows = buffImg.getHeight();
@@ -27,7 +27,7 @@ public class TextImage {
 			}
 			//img.add(temp);
 		}
-	}
+	}*/
 	
 	public TextImage(int[][] img) {
 		this.cols = img[0].length;
@@ -112,6 +112,16 @@ public class TextImage {
 			return false;
 		}
 	}
+
+	public void print(){
+		for(int row=0; row<rows; row++) {
+			for(int col=0; col<cols; col++) {
+				System.out.print(getPixel(row, col) + " ");
+			}
+			System.out.println("");
+		}
+	}
+	
 	public TextImage findBoundingBox(TextImage ti){
 		int[][] img = ti.getImg();
 		int rows = ti.getRows();
@@ -150,5 +160,6 @@ public class TextImage {
 		}
 		
 		return new TextImage(newimg);
+
 	}
 }
