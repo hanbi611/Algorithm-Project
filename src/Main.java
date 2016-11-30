@@ -11,18 +11,26 @@ public class Main {
 		File inputFolder1 = new File(input1); 
 		ArrayList<TextImage> queryImages = new ArrayList<TextImage>();
 		File inputFolder2 = new File(input2);
-		String[] images2 = inputFolder2.list();
+		ArrayList<TextImage> compareImages = new ArrayList<TextImage>();
 		
 		File outputFolder = new File(args[2]);
 		int k = Integer.parseInt(args[3]);
 
-		// Loop through inputfolder 1 to process Queryimages
+		// Loop through inputfolder 1&2 to process Queryimages
 		String[] queryImgNames = inputFolder1.list();
 		for (String s : queryImgNames){
 			String path = input1 + "/" + s;
-			TextImage queryti = new TextImage(path);
+			TextImage queryti = new TextImage(path); // image pre-processing happens in the constructor
 			queryImages.add(queryti);
 		}
+		
+		String[] compareImgNames = inputFolder2.list();
+		for (String s : compareImgNames){
+			String path = input2 + "/" + s;
+			TextImage comparei = new TextImage(path);
+			compareImages.add(comparei);
+		}
+		
 
 	}
 
