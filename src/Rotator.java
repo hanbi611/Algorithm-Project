@@ -81,7 +81,7 @@ public class Rotator {
 			newImg[row][col] = 1;
 		}
 		
-		return new TextImage(newImg, img.toString(), img.isAveraged());
+		return new TextImage(newImg, img.toString());
 	}
 	
 	private static int transformX(int x, int y, double theta) {

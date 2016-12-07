@@ -4,6 +4,10 @@ import java.util.*;
 import java.io.PrintWriter;
 
 public class Main {
+	/* TO DO:
+	 * 	1. FIX writeOutput to the correct format
+	 * 	2. finish processImages once other methods are finished. 
+	 */
 	final static int MAX = 1000;
 	public static void main(String[] args) {
 
@@ -44,6 +48,8 @@ public class Main {
 			// Step 5: (Re)Center
 			// Step 6: Resize
 			img = img.resize(width, height);
+			// Step 7: Average image
+			img = img.average();
 		}		
 	}
 	/** This method turns txt files of folder 2 into TextImage type. 
