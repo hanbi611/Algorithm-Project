@@ -3,7 +3,8 @@ import java.util.*;
 public class Rotator {
 	
 	public static void main(String[] args) {
-		TextImage t1 = new TextImage("digits/9_2.txt");
+		//TextImage t1 = new TextImage("digits/9_2.txt");
+		TextImage t1 = new TextImage("images/square4.txt");
 		/*TextImage t2 = new TextImage("digits/4_264.txt");
 		t1 = t1.average();
 		t2 = t2.average();
@@ -18,23 +19,24 @@ public class Rotator {
 		t2.print();
 		System.out.println(t1.compare(t2));
 		System.out.println(t1.isAveraged() + " " + t2.isAveraged());*/
-		System.out.println(t1.centerOfMassX() + " " + t1.centerOfMassY());
+		//System.out.println(t1.centerOfMassX() + " " + t1.centerOfMassY());
 		t1.print();
 		System.out.println("--------------------");
-		t1.contour().print();
+		//t1.contour().print();
+		Rotator.rotate(t1, Math.PI/2).print();
 	}
 	
 	//rotates a TextImage counterclockwise by theta
 	public static TextImage rotate(TextImage img, double theta) {
 		int rows = img.getRows();
 		int cols = img.getCols();
-		int midx = cols/2;
-		int midy = rows/2;
+		int midx = img.centerOfMassX();
+		int midy = img.centerOfMassY();
 		List<Integer> xcoords = new ArrayList<>();
 		List<Integer> ycoords = new ArrayList<>();
 		
 		//create list of points of colored pixels
-		//points are adjusted to be relative to the center pixel
+		//points are adjusted to be relative to the center of mass
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
 				int p = img.getPixel(row, col);
@@ -45,24 +47,37 @@ public class Rotator {
 			}
 		}
 		
+		// init top, left
+		int top = 0; int left = 0; 
+		
 		//transform x and y
 		for(int i = 0; i < xcoords.size(); i++) {
 			int x = transformX(xcoords.get(i), ycoords.get(i), theta) + midx;
 			int y = transformY(xcoords.get(i), ycoords.get(i), theta) + midy;
+			
+			//find values of top, left
+			if(x < left)
+				left = x;
+			if(y < top)
+				top = y;
+			
 			xcoords.set(i, x);
 			ycoords.set(i, y);
 		}
 		
-		//initialize new image
-		int[][] newImg = new int[rows][cols];
-		for(int row = 0; row < rows; row++)
-			for(int col = 0; col < cols; col++)
+		//calculates new image boundaries to account for out of bound errors after rotation
+		int len = (int)Math.ceil(Math.sqrt((rows * rows) + (cols * cols)));
+		
+		//init new array
+		int[][] newImg = new int[len][len];
+		for(int row = 0; row < len; row++)
+			for(int col = 0; col < len; col++)
 				newImg[row][col] = 0;
 		
 		//add in pixels at rotated coordinates
 		for(int i = 0; i < xcoords.size(); i++) {
-			int row = ycoords.get(i);
-			int col = xcoords.get(i);
+			int row = ycoords.get(i) - top;
+			int col = xcoords.get(i) - left;
 			newImg[row][col] = 1;
 		}
 		
