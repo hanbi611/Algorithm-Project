@@ -4,96 +4,117 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 public class TextImage {
 	//private List<List<Integer>> img;
 	private int[][] img;
 	private int rows, cols;
+	private String name;
+	private boolean averaged = false;
+	private final int noiseFactor = 3;
 
-	/*public TextImage(BufferedImage buffImg) {
-		//img = new ArrayList<>();
-		cols = buffImg.getWidth();
-		rows = buffImg.getHeight();
-		img = new int[rows][cols];
-		for(int y=0; y<rows; y++) {
-			//List<Integer> temp = new ArrayList<>();
-			for(int x=0; x<cols; x++) {
-				if(isBlack(x, y, buffImg))
-					//temp.add(1);
-					img[y][x] = 1;
-				else
-					//temp.add(0);
-					img[y][x] = 0;
-			}
-			//img.add(temp);
-		}
-	}*/
-
-	public TextImage(int[][] img) {
+	public TextImage(int[][] img, String name) {
 		this.cols = img[0].length;
-		this.rows = img.length; //rows;
+		this.rows = img.length;
 		this.img = img;
+		this.name = name;
 	}
 
-	public TextImage(int rows, int cols) {
+	public TextImage(int rows, int cols, String name) {
 		img = new int[rows][cols];
 		this.rows = rows;
 		this.cols = cols;
+		this.name = name;
 	}
 
-	public TextImage(String pathname) {
+	public TextImage(File f) {
+		this.name = f.toString();
 		int[][] img;
 		int cols = 0;
 		int rows = 0;
 		try {
-			Scanner fileScanner = new Scanner(new File(pathname));
-			while(fileScanner.hasNextLine()) {
+			Scanner fileScanner = new Scanner(f);
+			while (fileScanner.hasNextLine()) {
 				rows++;
 				Scanner lineScanner = new Scanner(fileScanner.nextLine());
-				while(lineScanner.hasNextInt()) {
+				while (lineScanner.hasNextInt()) {
 					cols++;
 					lineScanner.nextInt();
 				}
 				lineScanner.close();
 			}
-			cols = cols/rows;
+			cols = cols / rows;
 			img = new int[rows][cols];
 			fileScanner.close();
-			fileScanner = new Scanner(new File(pathname));
-			for(int row=0; row<rows; row++) {
+			fileScanner = new Scanner(f);
+			for (int row = 0; row < rows; row++) {
 				Scanner lineScanner = new Scanner(fileScanner.nextLine());
-				for(int col=0; col<cols; col++) {
+				for (int col = 0; col < cols; col++) {
 					int n = lineScanner.nextInt();
 					img[row][col] = n;
 				}
 				lineScanner.close();
 			}
 			fileScanner.close();
-
-			int[][] cropped = findBoundingBox(img);
-			// do Aligning
-			// do centering & resizing
-
 			this.img = img;
 			this.rows = rows;
 			this.cols = cols;
-
-
+			averaged = false;
 		}
-		catch (Exception e) {
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static int getColor(int x, int y, int color, BufferedImage img) {
-		int value = img.getRGB(x, y) >> color & 0xff;
-				return value;
-	}
-
-	public boolean isBlack(int x, int y, BufferedImage img) {
-		return getColor(x, y, 16, img) == 0;
-	}
-
+	//	public TextImage(String pathname) {
+	//		this.name = pathname;
+	//		int[][] img;
+	//		int cols = 0;
+	//		int rows = 0;
+	//		try {
+	//			Scanner fileScanner = new Scanner(new File(pathname));
+	//			while(fileScanner.hasNextLine()) {
+	//				rows++;
+	//				Scanner lineScanner = new Scanner(fileScanner.nextLine());
+	//				while(lineScanner.hasNextInt()) {
+	//					cols++;
+	//					lineScanner.nextInt();
+	//				}
+	//				lineScanner.close();
+	//			}
+	//			cols = cols/rows;
+	//			img = new int[rows][cols];
+	//			fileScanner.close();
+	//			fileScanner = new Scanner(new File(pathname));
+	//			for(int row=0; row<rows; row++) {
+	//				Scanner lineScanner = new Scanner(fileScanner.nextLine());
+	//				for(int col=0; col<cols; col++) {
+	//					int n = lineScanner.nextInt();
+	//					img[row][col] = n;
+	//				}
+	//				lineScanner.close();
+	//			}
+	//			fileScanner.close();
+	//			this.img = img;
+	//			this.rows = rows;
+	//			this.cols = cols;
+	//			averaged = false;
+	//		}
+	//		catch (Exception e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
+	//	
+	//	private static int getColor(int x, int y, int color, BufferedImage img) {
+	//		int value = img.getRGB(x, y) >> color & 0xff;
+	//		return value;
+	//	}
+	//	
+	//	public boolean isBlack(int x, int y, BufferedImage img) {
+	//		return getColor(x, y, 16, img) == 0;
+	//	}
+	//	
 	public int getCols() {
 		return cols;
 	}
@@ -120,6 +141,14 @@ public class TextImage {
 		}
 	}
 
+	public boolean isAveraged() {
+		return averaged;
+	}
+
+	private void setAveraged(boolean b){
+		averaged = b;
+	}
+
 	public void print(){
 		for(int row=0; row<rows; row++) {
 			for(int col=0; col<cols; col++) {
@@ -129,58 +158,284 @@ public class TextImage {
 		}
 	}
 
-	private int[][] findBoundingBox(int[][] img){
-		//int[][] img = ti.getImg();
-		//		int rows = ti.getRows();
-		//		int cols = ti.getCols();
-		int rows = img.length;
-		int cols = img[0].length;
-		int top = -1; int bottom = -1; int left = cols-1; int right = 0;
-		for (int row = 0; row<rows; row++){
-			for (int col = 0; col<cols; col++){
-				if (img[row][col] == 1){
-					if (top < 0)
-						top = row;
-					if (col < left)
-						left = col;
-					if (col > right)
-						right = col;
-				}}}
-
-		boolean found = false; 
-		for (int row = rows-1; row <=0; row --){
-			for (int col = 0; col < cols; col ++){
-				if (img[row][col] == 1)
-					found = true;
-			}
-			if (found == true){
-				bottom = row +1;
-				break;
+	/**
+	 * This method returns a new image with noise cancelled out. 
+	 * If there are less than 3 adjacent pixels,
+	 * the pixel will be considered a noise and will be change to 0.
+	 * @return Noise Cancelled TextImage
+	 */
+	public TextImage cancelNoise() {
+		int cols = getCols();
+		int rows = getRows();
+		TextImage avg = new TextImage(rows, cols, toString());
+		for(int col=0; col<cols; col++) {
+			int[] cs = {col-1, col, col+1};
+			for(int row=0; row<rows; row++) {
+				int[] rs = {row-1, row, row+1};
+				int sum = 0;
+				for(int c : cs) {
+					if(!((c < 0) || (c >= cols)))
+						for(int r : rs) 
+							if(!((r < 0) || (r >= rows))) 
+								sum += getPixel(r, c);
+				}
+				if (sum <= noiseFactor)
+					avg.setPixel(0,row,col);
 			}
 		}
-		int[][] newimg = new int[bottom-top+1][right-left+1];
-		int newRow = top - bottom +1; int newCol = right- left +1;
-		for (int row = 0; row<newRow; row++){
-			for (int col=0; col<newCol; col++){
-				newimg[row][col] = img[top][left];
-				left ++;
-			}
-			top ++;
-		}
-
-		return newimg;
-
+		return avg;
 	}
 
-	private TextImage process(TextImage txtImg) {
-		//This merely sets all pixels with a value of 2 or less to 0
-		//Should use after doing an averageProcess
+	/**
+	 * This method calculates the sum of adjacent pixels of all pixels
+	 * and reset the pixel with that sum. 
+	 * @return averaged TextImage
+	 */
+	public TextImage average() {
+		int cols = getCols();
+		int rows = getRows();
+		TextImage avg = new TextImage(rows, cols, toString());
+		for(int col=0; col<cols; col++) {
+			int[] cs = {col-1, col, col+1};
+			for(int row=0; row<rows; row++) {
+				int[] rs = {row-1, row, row+1};
+				int sum = 0;
+				for(int c : cs) {
+					if(!((c < 0) || (c >= cols)))
+						for(int r : rs) 
+							if(!((r < 0) || (r >= rows))) 
+								sum += getPixel(r, c);
+				}
+				avg.setPixel(sum, row, col);
+			}
+		}
+		avg.setAveraged(true);
+		return avg;
+	}
 
-		TextImage img = new TextImage(txtImg.getImg()); //, txtImg.getRows(), txtImg.getCols());
-		for(int row=0; row<txtImg.getRows(); row++)
-			for(int col=0; col<txtImg.getCols(); col++)
-				if(txtImg.getPixel(row, col) < 3)
-					img.setPixel(0, row, col);
-		return img;
+	/**
+	 * This method will find the bounding box of an image
+	 * and crop to size. 
+	 * @return cropped TextImage
+	 */
+	public TextImage crop(){
+		int top = 0;
+		int bot = rows-1;
+		int left = 0;
+		int right = cols-1;
+
+		//find top and bottom borders
+		for(int row = 0; row < rows; row++) {
+			for(int col = 0; col < cols; col++) {
+				if(img[row][col] > 0) {
+					if(top == 0)
+						top = row;
+					bot = row;
+				}
+			}
+		}
+
+		//find left and right borders
+		for(int col = 0; col < cols; col++) {
+			for(int row = 0; row < rows; row++) {
+				if(img[row][col] > 0) {
+					if(left == 0)
+						left = col;
+					right = col;
+				}
+			}
+		}
+
+		//create new TextImage
+		int newrow = bot - top + 1;
+		int newcol = right - left + 1;
+		int[][] newImg = new int[newrow][newcol];
+		for(int row = 0; row < newrow; row++) {
+			for(int col = 0; col < newcol; col++)
+				newImg[row][col] = img[row+top][col+left];
+		}
+		return new TextImage(newImg, toString());
+	}
+
+	/**
+	 * This method will take desired dimension as arguments and
+	 * resize the image to that dimension. 
+	 * @param txtImg
+	 * @param newRow
+	 * @param newCol
+	 * @return resized TextImage
+	 */
+	public TextImage resize(int newRow, int newCol) {
+		int rows = getRows();
+		int cols = getCols();
+		int rk[] = new int[newRow];
+		int ck[] = new int[newCol];
+
+		// rk[i] is the closest row index of the original txtImg for row i in the resized img
+		for(int i = 0; i<newRow; i++) {
+			double x = ((double)i * rows)/newRow;
+			int ik = (int)Math.round(x);
+			if(ik == rows) //prevent index error
+				ik--;
+			rk[i] = ik;
+		}
+
+		// ck[j] is the closest col index of the original txtImg for col j in the resized img
+		for(int j = 0; j<newCol; j++) {
+			double y = ((double)j * cols)/newCol;
+			int jk = (int)Math.round(y);
+			if(jk == cols) //prevent index error
+				jk--;
+			ck[j] = jk;
+		}
+		int img[][] = new int[newRow][newCol];
+
+		//interpolate
+		for(int row = 0; row < newRow; row++)
+			for(int col = 0; col < newCol; col++)
+				img[row][col] = getPixel(rk[row], ck[col]);
+
+		return new TextImage(img, toString()); 
+	}
+
+	public int centerOfMassX() {
+		int rows = getRows();
+		int cols = getCols();
+		int area = 0;;
+		int sum = 0;
+		for(int row = 0; row < rows; row++)
+			for(int col = 0; col < cols; col++) {
+				int pixel = getPixel(row, col);
+				if(pixel == 1) {
+					sum = sum + col;
+					area++;
+				}
+			}
+		double xc = ((double)sum)/area;
+		return (int)Math.round(xc);
+	}
+
+	public int centerOfMassY() {
+		int rows = getRows();
+		int cols = getCols();
+		int area = 0;
+		int sum = 0;
+		for(int row = 0; row < rows; row++)
+			for(int col = 0; col < cols; col++) {
+				int pixel = getPixel(row, col);
+				if(pixel == 1) {
+					sum = sum + row;
+					area++;
+				}
+			}
+		double yc = ((double)sum)/area;
+		return (int)Math.round(yc);
+	}
+
+	public TextImage contour() {
+		int[][] newImg = new int[rows][cols];
+		int currentRow = 0;
+		int currentCol = 0;
+
+		//init newImg
+		for(int row = 0; row < rows; row++)
+			for(int col = 0; col < cols; cols++)
+				newImg[row][col] = 0;
+
+		//do row contours
+		for(int row = 0; row < rows; row++) {
+			for(int col = 0; col < cols; col++) {
+				int pixel = getPixel(row, col);
+				if(pixel != currentRow) { //found edge
+					newImg[row][col] = 1;
+					System.out.println("found edge");
+				}
+				currentRow = pixel;
+			}
+		}
+
+		//do col contours
+		for(int col = 0; col < cols; col++) {
+			for(int row = 0; row < rows; row++) {
+				int pixel = getPixel(row, col);
+				if(pixel != currentCol)
+					newImg[row][col] = 1;
+				currentCol = pixel;
+			}
+		}
+
+		return new TextImage(newImg, toString());
+	}
+
+	public int categorize() {
+		int w = getCols();
+		int h = getRows();
+		int sum = 0;
+
+		//upper left
+		for(int x = (w/8); x < (3*w)/8; x++) {
+			for(int y = (h/8); y < (3*h)/8; y++) {
+				sum = sum + img[y][x];
+			}
+		}
+
+		//upper right
+		for(int x = (5*w/8); x < (7*w)/8; x++) {
+			for(int y = (h/8); y < (3*h)/8; y++) {
+				sum = sum + img[y][x];
+			}
+		}
+
+		//lower left
+		for(int x = (w/8); x < (3*w)/8; x++) {
+			for(int y = (5*h/8); y < (7*h)/8; y++) {
+				sum = sum + img[y][x];
+			}
+		}
+
+		//lower right
+		for(int x = (5*w/8); x < (7*w)/8; x++) {
+			for(int y = 5*(h/8); y < (7*h)/8; y++) {
+				sum = sum + img[y][x];
+			}
+		}
+
+		double n = sum * 4;
+		double frac = 10 * n/(w * h);
+		//return some integer between 0 and 9
+		return (int)frac;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public double compare(TextImage t) {
+		int r1 = getRows();
+		int c1 = getCols();
+		int r2 = t.getRows();
+		int c2 = t.getCols();
+
+		TextImage resized1 = Resizer.resize(this, (r1 + r2)/2, (c1 + c2)/2);
+		TextImage resized2 = Resizer.resize(t, (r1 + r2)/2, (c1 + c2)/2);
+
+		double diff = 0;
+
+		for(int col=0; col<resized1.getCols(); col++) {
+			for(int row=0; row<resized1.getRows(); row++) {
+				int pix1 = resized1.getPixel(row, col);
+				int pix2 = resized2.getPixel(row, col);
+				diff += Math.abs(pix1-pix2);
+			}
+		}
+
+		double z = getCols()*t.getRows();
+		double per = diff/z;
+		if(averaged)
+			per = per/9;
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(2);
+		return Double.parseDouble(df.format(per));
 	}
 }
