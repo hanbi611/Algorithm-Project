@@ -164,7 +164,7 @@ public class TextImage {
 	 * the pixel will be considered a noise and will be change to 0.
 	 * @return Noise Cancelled TextImage
 	 */
-	public TextImage cancelNoise() {
+	public void cancelNoise() {
 		int cols = getCols();
 		int rows = getRows();
 		TextImage avg = new TextImage(rows, cols, toString());
@@ -180,10 +180,9 @@ public class TextImage {
 								sum += getPixel(r, c);
 				}
 				if (sum <= noiseFactor)
-					avg.setPixel(0,row,col);
+					setPixel(0,row,col);
 			}
 		}
-		return avg;
 	}
 
 	/**

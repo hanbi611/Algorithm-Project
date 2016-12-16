@@ -40,7 +40,7 @@ public class Main {
 	private static void processImages(List<TextImage> images, int height, int width){
 		for (TextImage img : images){
 			// Step 1: Cancel out noise
-			img = img.cancelNoise();
+			img.cancelNoise();
 			// Step 2: Crop
 			img = img.crop();
 			// Step 3: Center
